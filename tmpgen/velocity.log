@@ -1,0 +1,52 @@
+Thu Jul 16 15:01:50 CST 2015  [debug] AvalonLogSystem initialized using logfile 'velocity.log'
+Thu Jul 16 15:01:50 CST 2015   [info] ************************************************************** 
+Thu Jul 16 15:01:50 CST 2015   [info] Starting Jakarta Velocity v1.4
+Thu Jul 16 15:01:50 CST 2015   [info] RuntimeInstance initializing.
+Thu Jul 16 15:01:50 CST 2015   [info] Default Properties File: org\apache\velocity\runtime\defaults\velocity.properties
+Thu Jul 16 15:01:50 CST 2015   [info] Trying to use logger class org.apache.velocity.runtime.log.AvalonLogSystem
+Thu Jul 16 15:01:50 CST 2015   [info] Using logger class org.apache.velocity.runtime.log.AvalonLogSystem
+Thu Jul 16 15:01:50 CST 2015   [info] Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+Thu Jul 16 15:01:50 CST 2015   [info] Resource Loader Instantiated: org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:50 CST 2015   [info] FileResourceLoader : initialization starting.
+Thu Jul 16 15:01:50 CST 2015   [info] FileResourceLoader : adding path '.'
+Thu Jul 16 15:01:50 CST 2015   [info] FileResourceLoader : initialization complete.
+Thu Jul 16 15:01:50 CST 2015   [info] ResourceCache : initialized. (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+Thu Jul 16 15:01:50 CST 2015   [info] Default ResourceManager initialization complete.
+Thu Jul 16 15:01:50 CST 2015   [info] Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+Thu Jul 16 15:01:50 CST 2015   [info] Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+Thu Jul 16 15:01:50 CST 2015   [info] Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+Thu Jul 16 15:01:50 CST 2015   [info] Loaded System Directive: org.apache.velocity.runtime.directive.Include
+Thu Jul 16 15:01:50 CST 2015   [info] Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+Thu Jul 16 15:01:50 CST 2015   [info] Created: 20 parsers.
+Thu Jul 16 15:01:50 CST 2015   [info] Velocimacro : initialization starting.
+Thu Jul 16 15:01:50 CST 2015   [info] Velocimacro : adding VMs from VM library template : VM_global_library.vm
+Thu Jul 16 15:01:50 CST 2015  [error] ResourceManager : unable to find resource 'VM_global_library.vm' in any resource loader.
+Thu Jul 16 15:01:50 CST 2015   [info] Velocimacro : error using  VM library template VM_global_library.vm : org.apache.velocity.exception.ResourceNotFoundException: Unable to find resource 'VM_global_library.vm'
+Thu Jul 16 15:01:50 CST 2015   [info] Velocimacro :  VM library template macro registration complete.
+Thu Jul 16 15:01:50 CST 2015   [info] Velocimacro : allowInline = true : VMs can be defined inline in templates
+Thu Jul 16 15:01:50 CST 2015   [info] Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+Thu Jul 16 15:01:50 CST 2015   [info] Velocimacro : allowInlineLocal = false : VMs defined inline will be  global in scope if allowed.
+Thu Jul 16 15:01:50 CST 2015   [info] Velocimacro : messages on  : VM system will output logging messages
+Thu Jul 16 15:01:50 CST 2015   [info] Velocimacro : autoload off  : VM system will not automatically reload global library macros
+Thu Jul 16 15:01:50 CST 2015   [info] Velocimacro : initialization complete.
+Thu Jul 16 15:01:50 CST 2015   [info] Velocity successfully started.
+Thu Jul 16 15:01:50 CST 2015   [info] ResourceManager : found 1437030110903 with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:50 CST 2015   [info] ResourceManager : found ./template_hsa\FIELDMAP_CODE_${objectname}.txt with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:50 CST 2015   [info] ResourceManager : found 1437030110929 with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:50 CST 2015   [info] ResourceManager : found 1437030110935 with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:50 CST 2015   [info] ResourceManager : found 1437030110940 with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:50 CST 2015   [info] ResourceManager : found 1437030110944 with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:50 CST 2015   [info] ResourceManager : found 1437030110948 with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:50 CST 2015   [info] ResourceManager : found 1437030110952 with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:50 CST 2015   [info] ResourceManager : found 1437030110956 with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:50 CST 2015   [info] ResourceManager : found ./template_hsa\java\$baseproject\$project\$module\businfra\$submodule\${objectname}DAO.java with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:50 CST 2015   [info] ResourceManager : found 1437030110987 with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:50 CST 2015   [info] ResourceManager : found ./template_hsa\java\$baseproject\$project\$module\businfra\$submodule\${objectname}EJBWrapper.java with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:51 CST 2015   [info] ResourceManager : found 1437030110998 with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:51 CST 2015   [info] ResourceManager : found ./template_hsa\java\$baseproject\$project\$module\businfra\$submodule\${objectname}Service.java with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:51 CST 2015   [info] ResourceManager : found 1437030111010 with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:51 CST 2015   [info] ResourceManager : found ./template_hsa\java\$baseproject\$project\$module\businfra\$submodule\${objectname}TO.java with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:51 CST 2015   [info] ResourceManager : found 1437030111028 with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:51 CST 2015   [info] ResourceManager : found 1437030111032 with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:51 CST 2015   [info] ResourceManager : found 1437030111037 with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+Thu Jul 16 15:01:51 CST 2015   [info] ResourceManager : found ./template_hsa\java\$baseproject\$project\$module\model\$submodule\${objectname}.java with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader

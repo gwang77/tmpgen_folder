@@ -1,0 +1,31 @@
+{
+    "index": {
+        "script": [
+            "scripts/common/index.js",
+            "scripts/common/file/index.js",
+            "scripts/common/file/controllers/index.js",
+            "scripts/common/file/controllers/file.ctrl.js",
+            "scripts/common/file/controllers/file.maintain.ctrl.js",
+            "scripts/common/file/filters/index.js",
+            "scripts/common/file/services/index.js",
+            "scripts/common/file/services/file.svr.js"
+        ],
+        "css": [
+        ]
+    },
+    "app": [
+        "commonUIApp.common"
+    ],
+    "config": {
+        "common": {
+            "file": {
+                "list": "json/file/searchFile",
+                "searchPage": "json/file/searchFilePage",
+                "find": "json/file/findFile/",
+                "create": "json/file/createFile",
+                "update": "json/file/updateFile",
+                "delete": "json/file/deleteFile/"
+            }
+        }
+    }
+}

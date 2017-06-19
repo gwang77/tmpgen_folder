@@ -1,0 +1,191 @@
+#set ($sharp="#")
+#set ($comma=",")
+#set ($start_char="{")
+#set ($end_char="}")
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="${baseproject}.${project}.${submodule}.mapper.${objectname}Mapper">
+
+    <resultMap id="ResultMap" type="${baseproject}.${project}.${submodule}.to.${objectname}TO" extends="${baseproject}.${project}.common.base.mapper.BaseMapper.BaseResultMap">
+#foreach( $field in $fieldList )
+#if(!$field.isIgnored())
+#if($field.isPK())
+        <id column="${field.getName()}" property="${field.getNameFirstLow()}"/>
+#end
+#end
+#end
+#foreach( $field in $fieldList )
+#if(!$field.isIgnored())
+#if(!$field.isPK())
+        <result column="${field.getName()}" property="${field.getNameFirstLow()}"/>
+#end
+#end
+#end
+    </resultMap>
+    
+    <insert id="insert" parameterType="${baseproject}.${project}.${submodule}.to.${objectname}TO" useGeneratedKeys="true" keyProperty="id">
+        insert into ${tablename} (
+#set ($valuesComma="")
+#foreach( $field in $fieldList )
+#if(${field.getName()}!="version")
+#if ($valuesComma != "")
+${valuesComma}
+#end
+            ${field.getName()}##
+#if ($valuesComma == "")
+#set ($valuesComma=",")
+#end
+#end
+#end
+
+        ) values (
+#set ($valuesComma="")
+#foreach( $field in $fieldList )
+#if(${field.getName()}!="version")
+#if ($valuesComma != "")
+${valuesComma}
+#end
+            #{${field.getNameFirstLow()}##
+#if($TmpGenUtil.isDate($field.getType()))
+,jdbcType=$TmpGenUtil.getFieldJDBCType($field.getType())##
+#end
+}##
+#if ($valuesComma == "")
+#set ($valuesComma=",")
+#end
+#end
+#end
+
+        )
+    </insert>
+
+    <update id="update" parameterType="${baseproject}.${project}.${submodule}.to.${objectname}TO">
+        update ${tablename} set 
+#set ($valuesComma="")
+#foreach( $field in $fieldList )
+#if (!$field.isPK())
+#if ($valuesComma != "")
+${valuesComma}
+#end
+#if(${field.getName()}!="version")
+            ${field.getName()} = #{${field.getNameFirstLow()}##
+#if($TmpGenUtil.isDate($field.getType()))
+,jdbcType=$TmpGenUtil.getFieldJDBCType($field.getType())##
+#end
+}##
+#end
+#if(${field.getName()}=="version")
+            version = version + 1
+#end
+#if ($valuesComma == "")
+#set ($valuesComma=",")
+#end
+#end
+#end
+        where 
+#set ($valuesComma="")
+#foreach( $field in $fieldList )
+#if ($field.isPK())
+#if ($valuesComma != "")
+${valuesComma}
+#end
+            ${field.getName()} = #{${field.getNameFirstLow()}##
+#if($TmpGenUtil.isDate($field.getType()))
+,jdbcType=$TmpGenUtil.getFieldJDBCType($field.getType())##
+#end
+}##
+#if ($valuesComma == "")
+#set ($valuesComma=" and ")
+#end
+#end
+#end
+
+    </update>
+
+    <delete id="delete" parameterType="${baseproject}.${project}.${submodule}.to.${objectname}TO">
+        delete from ${tablename}
+        where 
+#set ($valuesComma="")
+#foreach( $field in $fieldList )
+#if ($field.isPK())
+#if ($valuesComma != "")
+${valuesComma}
+#end
+            ${field.getName()} = #{${field.getNameFirstLow()}}##
+#if ($valuesComma == "")
+#set ($valuesComma=" and ")
+#end
+#end
+#end
+
+    </delete>
+
+    <select id="search" parameterType="${baseproject}.${project}.${submodule}.to.${objectname}TO" resultMap="ResultMap">
+        <if test="!pagination">
+            SELECT 
+#set ($valuesComma="")
+#foreach( $field in $fieldList )
+#if ($valuesComma != "")
+${valuesComma}
+#end
+            t.${field.getName()}##
+#if ($valuesComma == "")
+#set ($valuesComma=",")
+#end
+#end
+
+        </if>
+        <if test="pagination">
+            SELECT COUNT(1) AS TOTAL_SIZE
+        </if>
+        FROM ${tablename} t
+        WHERE 1=1
+#foreach( $field in $fieldList )
+        <if test="${field.getNameFirstLow()} != null##
+#if ($TmpGenUtil.isString(${field.getType()}))
+ and ${field.getNameFirstLow()} != ''##
+#end##        
+">
+            AND t.${field.getName()} = #{${field.getNameFirstLow()}##
+#if($TmpGenUtil.isDate($field.getType()))
+,jdbcType=$TmpGenUtil.getFieldJDBCType($field.getType())##
+#end
+}
+        </if>
+#end
+        <if test="!pagination">
+            <if test="null!=sortBy and ''!=sortBy ">
+                ORDER BY ${sortBy}  ${sortType}
+            </if>
+        </if>
+        <if test="!pagination and startIdx >= 0 and pageSize > 0">
+            limit ${startIdx}, ${pageSize}
+        </if>
+    </select>
+
+    <select id="find" parameterType="${baseproject}.${project}.${submodule}.to.${objectname}TO" resultMap="ResultMap">
+        SELECT 
+#set ($valuesComma="")
+#foreach( $field in $fieldList )
+#if ($valuesComma != "")
+${valuesComma}
+#end
+            t.${field.getName()}##
+#if ($valuesComma == "")
+#set ($valuesComma=",")
+#end
+#end
+
+        FROM ${tablename} t
+        WHERE 1 = 1 
+#foreach( $field in $fieldList )
+#if($field.isPK())
+        <if test="${field.getNameFirstLow()} != null">
+            AND t.${field.getName()} = #{${field.getNameFirstLow()}}
+        </if>
+#end
+#end
+    </select>
+
+</mapper>

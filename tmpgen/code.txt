@@ -1,0 +1,1591 @@
+D:\personal\MyProject\tmpgen\build.properties
+#Define which jar file to be distributed.
+#db.driver.jar=mysql-connector-java-5.1.15-bin.jar
+#db.driver.jar=jconn4-7.0.jar
+db.driver.jar=ojdbc14-10.2.0.4.jar
+
+#Define which template files to be distributed.
+#template.name=template_hsa
+template.name=template_hsa
+D:\personal\MyProject\tmpgen\build.xml
+<project name="tmpgen" default="dist" basedir=".">
+
+    <!-- set global properties for this build -->
+    <property file="build.properties" />
+    <property name="src" value="src"/>
+    <property name="dist" value="dist"/>
+    <property name="classes" value="classes"/>
+    <property name="out" value="out"/>
+    <property name="template" value="${template.name}"/>
+    <property name="config" value="config"/>
+    <property name="lib" value="lib"/>
+
+
+    <target name="init">
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${classes}"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <!-- Compile the java code from ${src} into ${classes} -->
+
+        <javac srcdir="${src}" destdir="${classes}">
+            <classpath>
+                <fileset dir="${lib}">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+        <copy todir="${classes}">
+            <fileset dir="${src}">
+                <include name="*.properties"/>
+            </fileset>
+        </copy>
+
+    </target>
+
+    <target name="package" depends="compile">
+        <!-- package compiled classes to a .jar file -->
+
+        <jar jarfile="tmpgen.jar">
+            <fileset dir="${classes}">
+                <include name="**"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <target name="dist" depends="package">
+        <!-- Create the distribution folder -->
+        <mkdir dir="${dist}"/>
+        <!-- Copy distribution file to the folder -->
+        <copy todir="${dist}">
+            <fileset dir=".">
+                <include name="${out}/**"/>
+                <include name="${template}/**"/>
+                <include name="${config}/ParameterConfig.xml"/>
+                <include name="tmpgen.jar"/>
+                <include name="*.bat"/>
+                <exclude name="build.bat"/>
+                <include name="readme.txt"/>
+                <include name="velocity.properties"/>
+                <include name="tmpgen.properties"/>
+                <include name="${lib}/velocity*.jar"/>
+                <include name="${lib}/commons*.jar"/>
+                <include name="${lib}/${db.driver.jar}"/>
+                <!--<include name="${lib}/poi*.jar"/>-->
+                <!--<include name="${lib}/xmlbeans*.jar"/>-->
+            </fileset>
+
+        </copy>
+
+        <!-- Create the distribution .Zip file -->
+        <jar jarfile="tmpgen.zip">
+            <fileset dir="${dist}">
+                <include name="**"/>
+            </fileset>
+        </jar>
+
+        <!-- Delete the ${build} and ${dist} directory trees -->
+        <delete dir="${dist}"/>
+    </target>
+
+    <target name="source">
+        <jar jarfile="src.zip">
+            <fileset dir=".">
+                <include name="${src}/**"/>
+            </fileset>
+        </jar>
+    </target>
+</project>
+
+
+D:\personal\MyProject\tmpgen\config\ParameterConfig.xml
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<parameters>
+    <parameter name="baseproject" value="hsa"/>
+    <parameter name="project" value="prism"/>
+    <parameter name="module" value="common"/>
+    <parameter name="submodule" value="appln"/>
+	<parameter name="objectname" value="Test,Test2" split=","/>
+	<parameter name="tablename" value="TBL_TEST,TBL_TEST" split=","/>
+
+	<parameter name="ignorefiles" value="USERS"/>
+
+    <!--
+    beanList configure the class to get Bean List. The class need implements BeanListReader, and implements getBeanList() method. The method result is List.
+    -->
+
+	<beanList name="fieldList" listClass="database.DBFieldReader"/>
+	<beanList name="fieldList2" listClass="database.ExcelDBFieldReader"/>
+	<beanList name="fieldList3" listClass="excel.ExcelReader"/>
+
+<!--
+	<fields>
+		<field name="id" type="INT" length="2" ispk="true"/>
+	</fields>
+-->
+
+	<process name="TmpGenUtil" classpath="process.TmpGenUtil"/>
+
+</parameters>
+
+
+D:\personal\MyProject\tmpgen\src\config\BeanListReader.java
+package config;
+
+import org.apache.velocity.VelocityContext;
+
+import java.util.List;
+
+public interface BeanListReader {
+    public List getBeanList(VelocityContext context);
+}
+
+D:\personal\MyProject\tmpgen\src\config\ParaData.java
+package config;
+
+import org.apache.commons.lang.StringUtils;
+
+public class ParaData {
+    String value = "";
+    String split = "";
+
+    public ParaData(String value) {
+        this.value = StringUtils.isBlank(value)?"":value;
+    }
+
+    public ParaData(String value, String split) {
+        this.value = StringUtils.isBlank(value)?"":value;
+        this.split = StringUtils.isBlank(split)?"":split;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getSplit() {
+        return split;
+    }
+
+    public String getLowVal() {
+        return value.toLowerCase();
+    }
+
+    public String getUpVal() {
+        return value.toUpperCase();
+    }
+
+    public String getFirstUpVal() {
+        String first = value.substring(0, 1);
+        return value.replaceFirst(first, first.toUpperCase());
+    }
+
+    public String getFirstlowVal() {
+        String first = value.substring(0, 1);
+        return value.replaceFirst(first, first.toLowerCase());
+    }
+
+    public String toString() {
+        return value;
+    }
+}
+
+D:\personal\MyProject\tmpgen\src\config\ParaDataListBean.java
+package config;
+
+public class ParaDataListBean {
+    private String name;
+    private String listClass;
+
+    public ParaDataListBean(String name, String listClass) {
+        this.name = name;
+        this.listClass = listClass;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getListClass() {
+        return listClass;
+    }
+
+    public void setListClass(String listClass) {
+        this.listClass = listClass;
+    }
+}
+
+D:\personal\MyProject\tmpgen\src\config\ParameterConfig.java
+package config;
+
+import database.DBField;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import util.TmpGenFilePathUtil;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class ParameterConfig {
+    private static ParameterConfig _instance;
+    private static HashMap parameterMap = new HashMap();
+    private static HashMap splitParameterMap = new HashMap();
+
+    public static ParameterConfig instance() {
+        if (_instance == null) {
+            _instance = new ParameterConfig();
+            _instance.initial();
+        }
+
+        return _instance;
+    }
+
+    public HashMap getParameterMap() {
+        return parameterMap;
+    }
+
+    public HashMap getSplitParameterMap() {
+        return splitParameterMap;
+    }
+
+    public String getParameterValue(String name) {
+        if (parameterMap == null) {
+            parameterMap = new HashMap();
+        }
+        return (String) parameterMap.get(name);
+    }
+
+    public String getSplitParameterValue(String name) {
+        if (splitParameterMap == null) {
+            splitParameterMap = new HashMap();
+        }
+        return (String) splitParameterMap.get(name);
+    }
+
+    private void initial() {
+        parameterMap = null;
+        parameterMap = new HashMap();
+
+        try {
+            DocumentBuilder docbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document doc = docbuilder.parse(TmpGenFilePathUtil.getConfigFile());
+            NodeList list = doc.getElementsByTagName("parameter");
+            for (int i = 0; i < list.getLength(); i++) {
+                Node node = list.item(i);
+                NamedNodeMap nodeMap = node.getAttributes();
+
+                Node subNode1 = nodeMap.getNamedItem("name");
+                String name = subNode1.getNodeValue();
+                Node subNode2 = nodeMap.getNamedItem("value");
+                String value = subNode2.getNodeValue();
+                parameterMap.put(name, value);
+
+                String split = "";
+                Node subNode3 = nodeMap.getNamedItem("split");
+                if (subNode3 != null) {
+                    split = subNode3.getNodeValue();
+                }
+                if (StringUtils.isNotBlank(split)) {
+                    splitParameterMap.put(name, split);
+                }
+            }
+            List nodeBeanList = new ArrayList();
+            NodeList nodeList = doc.getElementsByTagName("beanList");
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node node = nodeList.item(i);
+                NamedNodeMap nodeMap = node.getAttributes();
+
+                Node subNameNode = nodeMap.getNamedItem("name");
+                Node subClassNode = nodeMap.getNamedItem("listClass");
+                String keyName = subNameNode.getNodeValue();
+                String className = subClassNode.getNodeValue();
+                if (className != null && !className.trim().equals("")) {
+                    nodeBeanList.add(new ParaDataListBean(keyName, className));
+                }
+            }
+
+            parameterMap.put("beanList", nodeBeanList);
+
+            NodeList fieldList = doc.getElementsByTagName("fields");
+            List fields = getFields(fieldList);
+
+            parameterMap.put("fieldList", fields);
+
+            NodeList fieldListProcess = doc.getElementsByTagName("process");
+
+            initProcesses(fieldListProcess);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void initProcesses(NodeList nodeList) {
+
+        try {
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node node = (Node) nodeList.item(i);
+                NamedNodeMap nodeMap = node.getAttributes();
+
+                Node subNode1 = nodeMap.getNamedItem("name");
+                String name = subNode1.getNodeValue();
+                Node subNode2 = nodeMap.getNamedItem("classpath");
+                String value = subNode2.getNodeValue();
+                Object instance = null;
+                if (value != null && !"".equals(value.trim())) {
+                    Class clazz = Class.forName(value);
+                    instance = clazz.newInstance();
+                }
+                if (name != null && instance != null) {
+                    parameterMap.put(name, instance);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("err:" + e.getMessage());
+        }
+
+    }
+
+    public ArrayList getFields(NodeList nodeList) {
+        ArrayList list = new ArrayList();
+        try {
+//            DocumentBuilder docbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+//            Document doc = docbuilder.parse(TmpGenUtil.getConfigPath() + "\\FieldConfig.xml");
+//            NodeList nodeList = doc.getElementsByTagName("field");
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node fields = nodeList.item(i);
+                NodeList fieldList = fields.getChildNodes();
+                for (int j = 0; j < fieldList.getLength(); j++) {
+                    Node node = fieldList.item(j);
+                    String nodeName = node.getNodeName();
+                    if (!nodeName.trim().equals("field")) {
+                        continue;
+                    }
+
+                    NamedNodeMap nodeMap = node.getAttributes();
+
+                    String name = "";
+                    String type = "";
+                    int length = 0;
+                    boolean isPk = false;
+                    String desc = "";
+                    Node subNode1 = nodeMap.getNamedItem("name");
+
+                    name = subNode1.getNodeValue();
+                    Node subNode2 = nodeMap.getNamedItem("type");
+                    if (subNode2 != null) {
+                        type = subNode2.getNodeValue();
+                    }
+                    Node subNode3 = nodeMap.getNamedItem("length");
+                    if (subNode3 != null) {
+                        String sTmp = subNode3.getNodeValue();
+                        if (sTmp == null || sTmp.trim().equals("")) {
+                            length = 0;
+                        } else {
+                            length = Integer.parseInt(sTmp);
+                        }
+                    }
+                    Node subNode4 = nodeMap.getNamedItem("ispk");
+                    if (subNode4 != null) {
+                        String sTmp = subNode4.getNodeValue();
+                        if (sTmp == null || sTmp.trim().equals("")) {
+                            isPk = false;
+                        } else {
+                            isPk = Boolean.valueOf(sTmp).booleanValue();
+                        }
+                    }
+                    Node subNode5 = nodeMap.getNamedItem("desc");
+                    if (subNode5 != null) {
+                        desc = subNode5.getNodeValue();
+                        byte[] bt = desc.getBytes("iso-8859-1");
+                        desc = new String(bt);
+                    }
+                    list.add(new DBField(name, type, length, isPk, desc));
+                }
+            }
+            return list;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+}
+
+D:\personal\MyProject\tmpgen\src\database\DBField.java
+package database;
+
+import util.TmpGenProperties;
+
+public class DBField
+{
+    private String name;
+    private String type;
+    private int length;
+    private boolean isPK = false;
+    private String desc = "";
+
+    private static String ignorefields = TmpGenProperties.getProperties("ignorefields").toUpperCase();
+
+    public DBField()
+    {
+    }
+    public DBField(String name, String type, int length)
+    {
+        this.name = name;
+        this.type = type;
+        this.length = length;
+    }
+
+    public DBField(String name, String type, int length, boolean PK)
+    {
+        this.name = name;
+        this.type = type;
+        this.length = length;
+        isPK = PK;
+    }
+
+    public DBField(String name, String type, int length, boolean PK, String desc)
+    {
+        this.name = name;
+        this.type = type;
+        this.length = length;
+        isPK = PK;
+        this.desc = desc;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public String getType()
+    {
+        return type;
+    }
+
+    public void setType(String type)
+    {
+        this.type = type;
+    }
+
+    public int getLength()
+    {
+        return length;
+    }
+
+    public void setLength(int length)
+    {
+        this.length = length;
+    }
+
+    public boolean isPK()
+    {
+        return isPK;
+    }
+
+    public void setPK(boolean PK)
+    {
+        isPK = PK;
+    }
+
+    public String getDesc()
+    {
+        return desc;
+    }
+
+    public void setDesc(String desc)
+    {
+        this.desc = desc;
+    }
+
+    public String getNameLow()
+    {
+        return name.toLowerCase();
+    }
+
+    public String getNameLowFirstUp()
+    {
+        String first = getNameLow().substring(0, 1);
+        return getNameLow().replaceFirst(first, first.toUpperCase());
+    }
+
+    public String getNameUp()
+    {
+        return name.toUpperCase();
+    }
+
+    public String getNameFirstUp()
+    {
+        String first = name.substring(0, 1);
+        return name.replaceFirst(first, first.toUpperCase());
+    }
+
+    public String getNameFirstLow()
+    {
+        String first = name.substring(0, 1);
+        return name.replaceFirst(first, first.toLowerCase());
+    }
+
+    public String getLowVal()
+    {
+        return name.toLowerCase();
+    }
+
+    public String getUpVal()
+    {
+        return name.toUpperCase();
+    }
+
+    public boolean isIgnored() {
+        if (ignorefields != null) {
+            return ignorefields.indexOf("," + name.toUpperCase() + ",") >= 0;
+        }
+        return false;
+    }
+}
+
+D:\personal\MyProject\tmpgen\src\database\DBFieldReader.java
+package database;
+
+import config.BeanListReader;
+import config.ParaData;
+import org.apache.velocity.VelocityContext;
+import util.TmpGenProperties;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class DBFieldReader implements BeanListReader {
+    public static final Map<String, List> fieldListMap = new HashMap<String, List>();
+
+    public List getBeanList(VelocityContext context) {
+        ParaData paraData = (ParaData) context.get("tablename");
+        String tableName = paraData.getValue();
+        List fieldList = fieldListMap.get(tableName);
+        if (fieldList != null) {
+            return fieldList;
+        }
+        fieldList = getBeanList(paraData.getValue());
+        fieldListMap.put(tableName, fieldList);
+        return fieldList;
+    }
+
+    public List getBeanList(String tableName) {
+
+        List<DBField> list = new ArrayList<DBField>();
+        Connection conn = null;
+        ResultSet rs = null;
+        ResultSet rsPK = null;
+        try {
+            conn = getConnection();
+            DatabaseMetaData metaData = conn.getMetaData();
+
+            rs = metaData.getColumns(null, null, tableName, null);
+            while (rs.next()) {
+//                String name = rs.getString("table_name");
+                String columnName = rs.getString("column_name");
+                String columnType = rs.getString("TYPE_NAME");
+                if (columnType != null && columnType.contains("identity")) {
+                    columnType = columnType.replaceAll("identity", "").trim();
+                }
+
+                DBField dbField = new DBField();
+                dbField.setName(columnName);
+                dbField.setType(convertDBType(columnType.toUpperCase()));
+                list.add(dbField);
+            }
+            rsPK = metaData.getPrimaryKeys(null, null, tableName);
+            while (rsPK.next()) {
+                String columnName = rsPK.getString("column_name");
+
+                for (DBField dbField : list) {
+                    if (dbField.getName().equalsIgnoreCase(columnName)) {
+                        dbField.setPK(true);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+            if (rsPK != null) {
+                try {
+                    rsPK.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
+        return list;
+    }
+
+    private String convertDBType(String dbType) {
+        return dbType.replaceAll(" ", "_");
+    }
+
+    public Connection getConnection() throws Exception {
+        Connection conn;
+        String driver = TmpGenProperties.getProperties("db.driver");
+        String connectionURL = TmpGenProperties.getProperties("db.connection");
+        String userName = TmpGenProperties.getProperties("db.user");
+        String password = TmpGenProperties.getProperties("db.pwd");
+        Class.forName(driver);
+        conn = DriverManager.getConnection(connectionURL, userName, password);
+        return conn;
+    }
+}
+
+D:\personal\MyProject\tmpgen\src\database\ExcelDBFieldReader.java
+package database;
+
+import config.BeanListReader;
+import excel.ExcelUtil;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import util.TmpGenProperties;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class ExcelDBFieldReader implements BeanListReader {
+    public static final Map<String, List> fieldListMap = new HashMap<String, List>();
+
+    public List getBeanList(VelocityContext context) {
+        String excelPath = TmpGenProperties.getProperties("excel.path");
+        String sheetName = TmpGenProperties.getProperties("excel.sheet");
+        String nameColName = TmpGenProperties.getProperties("excel.field.name.col");
+        String typeColName = TmpGenProperties.getProperties("excel.field.type.col");
+        String lengthColName = TmpGenProperties.getProperties("excel.field.length.col");
+        String isPkColName = TmpGenProperties.getProperties("excel.field.ispk.col");
+
+        List fieldList = fieldListMap.get(sheetName);
+        if (fieldList != null) {
+            return fieldList;
+        }
+        fieldList = getExcelFieldList(excelPath, sheetName, nameColName, typeColName, lengthColName, isPkColName);
+        fieldListMap.put(sheetName, fieldList);
+        return fieldList;
+    }
+
+    private List<DBField> getExcelFieldList(String excelPath, String sheetName, String nameColName, String typeColName, String lengthColName, String isPkColName) {
+        List<DBField> fieldList = new ArrayList<DBField>();
+        List<Map> mapList = ExcelUtil.getExcelFieldList(excelPath, sheetName);
+        for (Map map : mapList) {
+            String name = (String) map.get(nameColName);
+            String type = (String) map.get(typeColName);
+            String lengthStr = (String) map.get(lengthColName);
+            String isPK = (String) map.get(isPkColName);
+            if (StringUtils.isBlank(name) && StringUtils.isBlank(type) && StringUtils.isBlank(lengthStr) && StringUtils.isBlank(isPK)) {
+                break;
+            }
+            if (isIgnoreExcelVal(name, type)) {
+                continue;
+            }
+            lengthStr = StringUtils.isBlank(lengthStr) ? "0" : lengthStr;
+            isPK = StringUtils.isBlank(isPK) ? "false" : isPK;
+            fieldList.add(new DBField(name, type, Integer.parseInt(lengthStr), Boolean.parseBoolean(isPK)));
+        }
+        return fieldList;
+    }
+
+    private boolean isIgnoreExcelVal(String str1, String str2) {
+        return StringUtils.isBlank(str1) || StringUtils.isBlank(str2);
+    }
+}
+
+D:\personal\MyProject\tmpgen\src\excel\ExcelReader.java
+package excel;
+
+import config.BeanListReader;
+import org.apache.velocity.VelocityContext;
+import util.TmpGenProperties;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class ExcelReader implements BeanListReader {
+    public static final Map<String, List> beanListMap = new HashMap<String, List>();
+
+    public List getBeanList(VelocityContext context) {
+        String excelPath = TmpGenProperties.getProperties("excel.path");
+        String sheetName = TmpGenProperties.getProperties("excel.sheet");
+
+        List fieldList = beanListMap.get(sheetName);
+        if (fieldList != null) {
+            return fieldList;
+        }
+
+        fieldList = ExcelUtil.getExcelFieldList(excelPath, sheetName);
+        beanListMap.put(sheetName, fieldList);
+        return fieldList;
+    }
+}
+
+D:\personal\MyProject\tmpgen\src\excel\ExcelUtil.java
+package excel;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.*;
+
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class ExcelUtil {
+    public static List<Map> getExcelFieldList(String excelPath, String sheetName) {
+        List<Map> beanList = new ArrayList<Map>();
+        try {
+            InputStream is = new FileInputStream(excelPath);
+            Workbook wb = WorkbookFactory.create(is);
+            Sheet sheet = wb.getSheet(sheetName);
+            int rowID = 0;
+
+            List<String> colNameList = new ArrayList<String>();
+            Row firstRow = sheet.getRow(rowID);
+            int colIdx = 0;
+            Cell cell = firstRow.getCell(colIdx);
+            while (cell != null && StringUtils.isNotBlank(getCellValue(cell))) {
+                colNameList.add(getCellValue(cell));
+                colIdx++;
+                cell = firstRow.getCell(colIdx);
+            }
+
+            rowID = 1;
+            int totalRow = sheet.getPhysicalNumberOfRows();
+            while (true) {
+                Row row = sheet.getRow(rowID);
+                if (row == null || rowID > totalRow) {
+                    break;
+                }
+                Map<String, String> map = new HashMap<String, String>();
+                for (int i = 0; i < colNameList.size(); i++) {
+                    Cell cellName = row.getCell(i);
+                    String val = getCellValue(cellName);
+                    map.put(colNameList.get(i), val);
+                }
+
+                String firstVal = map.get(colNameList.get(0));
+                if (StringUtils.isBlank(firstVal)) {
+                    break;
+                }
+                beanList.add(map);
+
+                rowID++;
+            }
+            is.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return beanList;
+    }
+
+    public static String getCellValue(Cell cell) {
+        String value = "";
+        String format;
+        double dValue;
+        format = cell.getCellStyle().getDataFormatString();
+        switch (cell.getCellType()) {
+            case Cell.CELL_TYPE_NUMERIC:
+                dValue = cell.getNumericCellValue();
+                if (StringUtils.equals(format, "General") || StringUtils.equals(format, "@")) {
+                    value = new DecimalFormat("0.###############").format(dValue);
+                } else {
+                    format = StringUtils.replace(format, "+", "");
+                    format = StringUtils.replace(format, "_", "");
+                    DecimalFormat df = new DecimalFormat(format);
+
+                    value = df.format(dValue);
+                    value = StringUtils.replace(value, "E", "E+");
+                }
+
+                break;
+            case Cell.CELL_TYPE_STRING:
+                if (cell.getStringCellValue() != null)
+                    value = StringUtils.trim(cell.getStringCellValue());
+                break;
+            default:
+        }
+
+        return value.trim();
+    }
+}
+D:\personal\MyProject\tmpgen\src\FileManage.java
+import java.io.*;
+
+
+public final class FileManage
+{
+	public static final int PARAMETER_ERROR=-1;
+	public static final int FILE_NOT_EXIST=-2;
+	public static final int READ_ONLY=1;
+	public static final int READ_WRITE=2;
+	
+	public static int getReadWrite(String filepath)
+	{
+		if(filepath==null || filepath.trim().length()==0) return PARAMETER_ERROR;
+			
+		File fp=new File(filepath);
+		if(!fp.exists()) return FILE_NOT_EXIST;
+		
+		if(fp.canWrite()) return READ_WRITE;
+		else return READ_ONLY;
+	}
+
+	public static boolean checkFileExist(String filepath)
+	{
+		if(filepath==null || filepath.trim().length()==0) return false;
+			
+		File fp=new File(filepath);
+		if(!fp.exists()) return false;
+		if(!fp.isFile()) return false;
+		
+		return true;
+	}
+		
+	public static boolean checkFolderExist(String filepath)
+	{
+		if(filepath==null || filepath.trim().length()==0) return false;
+			
+		File fp=new File(filepath);
+		if(!fp.exists()) return false;
+		if(!fp.isDirectory()) return false;
+		
+		return true;
+	}	
+	
+	public static boolean createFolder(String folderpath)
+	{
+		if(folderpath==null || folderpath.trim().length()==0) return false;
+			
+		File fp=new File(folderpath);
+		if(fp.exists()) return false;
+		
+		return fp.mkdirs();
+	}	
+	
+	public static boolean delete(String filepath)
+	{
+		if(filepath==null || filepath.trim().length()==0) return false;
+			
+		File fp=new File(filepath);
+		if(!fp.exists()) return false;
+		
+		return fp.delete();
+	}	
+
+	public static boolean deleteFolder(String filepath)
+	{
+		if(filepath==null || filepath.trim().length()==0) return false;
+			
+		File fp=new File(filepath);
+
+		return deleteFolder(fp);	
+	}	
+
+	public static boolean deleteFolder(File file)
+	{
+		if(file==null) return false;
+		
+		File[] subfile=file.listFiles();
+		for(int i=0;i<subfile.length;i++)
+		{
+			if(subfile[i].isDirectory())
+			{
+				if(!deleteFolder(subfile[i])) return false;
+			}
+			else if(subfile[i].isFile())
+			{
+				if(!subfile[i].delete()) return false;
+			}
+		}
+		
+		return file.delete();	
+	}
+
+	public static String readTextFile(String filepath)
+	{
+		if(filepath==null || filepath.trim().length()==0) return null;
+		try
+		{	
+			String contents=null;
+			RandomAccessFile fp=new RandomAccessFile(filepath,"r");
+
+			String strtmp=fp.readLine();
+			while(strtmp!=null)
+			{
+				if(contents==null)
+					contents=strtmp;
+				else
+					contents=contents + "\n" + strtmp;
+				strtmp=fp.readLine();	
+			}
+			fp.close();
+			return contents;
+		}	
+		catch(Exception e)
+		{
+			System.out.println("Read File error:"+e.toString());
+			return null;
+		}
+	}
+
+	public static byte[] readFile(String filepath)
+	{
+		if(filepath==null || filepath.trim().length()==0) return null;
+		try
+		{	
+			RandomAccessFile fp=new RandomAccessFile(filepath,"r");
+			byte[] contents=new byte[(int)fp.length()];
+			
+			fp.read(contents);
+			fp.close();
+			return contents;
+		}	
+		catch(Exception e)
+		{
+			System.out.println("Read File error:"+e.toString());
+			return null;
+		}
+	}
+	public static byte[] readFile(File filepath)
+	{
+		if(filepath==null) return null;
+		try
+		{	
+			RandomAccessFile fp=new RandomAccessFile(filepath,"r");
+			byte[] contents=new byte[(int)fp.length()];
+			
+			fp.read(contents);
+			fp.close();
+			return contents;
+		}	
+		catch(Exception e)
+		{
+			System.out.println("Read File error:"+e.toString());
+			return null;
+		}
+	}
+
+	public static boolean saveFile(String str,String filepath)
+	{
+		if(filepath==null || filepath.trim().length()==0) return false;
+		String strTmp=str;
+		if(strTmp==null) strTmp="";
+		try
+		{
+			File file=new File(filepath);
+			RandomAccessFile rdfile=new RandomAccessFile(file, "rw"); 
+	
+			rdfile.write(strTmp.getBytes());
+			rdfile.close();
+		}
+		catch(Exception e)
+		{
+			System.out.println("save File error:"+e.toString());
+			return false;
+		}
+		return true;
+	}
+	
+	public static boolean saveFile(byte[] str,String filepath)
+	{
+		if(filepath==null || filepath.trim().length()==0) return false;
+		byte[] strTmp=str;
+		if(strTmp==null) strTmp=new byte[0];
+		try
+		{
+			File file=new File(filepath);
+			RandomAccessFile rdfile=new RandomAccessFile(file, "rw"); 
+	
+			rdfile.write(strTmp);
+			rdfile.close();
+		}
+		catch(Exception e)
+		{
+			System.out.println("save File error:"+e.toString());
+			return false;
+		}
+		return true;
+	}
+
+	public static boolean copyFile(String spath,String tpath)
+	{
+		if(spath==null || spath.trim().length()==0 ||tpath==null || tpath.trim().length()==0)
+			return false;
+		try
+		{	
+			File sfile=new File(spath);
+			String filename=sfile.getName();
+			
+			File tfile=new File(tpath,filename);
+			
+			RandomAccessFile rdtfile=new RandomAccessFile(tfile, "rw"); 
+	
+			RandomAccessFile rdsfile=new RandomAccessFile(sfile,"r");
+			byte[] contents=new byte[(int)rdsfile.length()];
+			rdsfile.read(contents);
+			rdsfile.close();
+			
+			rdtfile.write(contents);
+			rdtfile.close();
+			return true;
+		}
+		catch(Exception e)
+		{
+			System.out.println("Copy file error:" + e.toString());
+			return false;
+		}
+	}
+
+	public static boolean moveFile(String spath,String tpath)
+	{
+		if(spath==null || spath.trim().length()==0 ||tpath==null || tpath.trim().length()==0)
+			return false;
+		if(copyFile(spath,tpath))
+			return delete(spath);
+		else
+			return false;
+	}
+
+} 
+
+
+D:\personal\MyProject\tmpgen\src\process\TmpGenUtil.java
+package process;
+
+import util.TmpGenProperties;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+public class TmpGenUtil {
+    private static Map<String, Object> DB_FIELD_TYPE_MAPPING;
+
+    private static final String INT[] = TmpGenProperties.getProperties("db.field.type.group.INT").split(",");
+    private static final String DOUBLE[] = TmpGenProperties.getProperties("db.field.type.group.DOUBLE").split(",");
+    private static final String DATE[] = TmpGenProperties.getProperties("db.field.type.group.DATE").split(",");
+    private static final String STRING[] = TmpGenProperties.getProperties("db.field.type.group.STRING").split(",");
+    private static final String BYTEARRAY[] = TmpGenProperties.getProperties("db.field.type.group.BYTEARRAY").split(",");
+
+    public static boolean isInt(String fieldType) {
+        return isType(fieldType, INT);
+    }
+
+    public static boolean isString(String fieldType) {
+        return isType(fieldType, STRING);
+    }
+
+    public static boolean isDate(String fieldType) {
+        return isType(fieldType, DATE);
+    }
+
+    public static boolean isDouble(String fieldType) {
+        return isType(fieldType, DOUBLE);
+    }
+
+    public static boolean isByteArr(String fieldType) {
+        return isType(fieldType, BYTEARRAY);
+    }
+
+    private static boolean isType(String fieldType, String[] typeArr) {
+        for (String aTypeArr : typeArr) {
+            if (aTypeArr.equals(fieldType)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Map getDBFieldTypeMapping() {
+        Properties properties = TmpGenProperties.properties;
+        Set set = properties.entrySet();
+        for (Object aSet : set) {
+            Map.Entry entry = (Map.Entry) aSet;
+            String key = (String) entry.getKey();
+            if (key.contains("db.field.type.mapping.")) {
+                DB_FIELD_TYPE_MAPPING.put(key.substring(22), entry.getValue());
+            }
+        }
+        return DB_FIELD_TYPE_MAPPING;
+    }
+
+    public static String getFieldJavaTypeFull(String fieldType) {
+        if (DB_FIELD_TYPE_MAPPING == null) {
+            DB_FIELD_TYPE_MAPPING = new HashMap<String, Object>();
+            getDBFieldTypeMapping();
+        }
+        String type = (String) DB_FIELD_TYPE_MAPPING.get(fieldType.toUpperCase());
+        if (type == null) {
+            System.out.println("Cannot find configuration of DB type:" + fieldType + ". Please configure it in tmpgen.properties");
+            type = "";
+        }
+        return type;
+    }
+
+    public static String getFieldJavaType(String fieldType) {
+        String type = getFieldJavaTypeFull(fieldType);
+        if (type != null && type.length() > 0) {
+            int idx = type.lastIndexOf(".");
+            if (idx >= 0) {
+                type = type.substring(idx + 1);
+            }
+        }
+        return type;
+    }
+
+    public static String getFieldJavaTypeForPWF(String fieldType) {
+        return getFieldJavaTypeFull(fieldType);
+    }
+
+    public static String getFieldGetMethod(String fieldType) {
+        String result = "";
+        if (TmpGenUtil.isInt(fieldType)) {
+            result = "getInt";
+        } else if (TmpGenUtil.isDouble(fieldType)) {
+            result = "getDouble";
+        } else if (TmpGenUtil.isDate(fieldType)) {
+            result = "getDate";
+        } else if (TmpGenUtil.isString(fieldType)) {
+            result = "getString";
+        } else if (TmpGenUtil.isByteArr(fieldType)) {
+            result = "getByte";
+        }
+        return result;
+    }
+
+    public String getValLow(String val) {
+        return val.toLowerCase();
+    }
+
+    public String getValUp(String val) {
+        return val.toUpperCase();
+    }
+
+    public String getValLowFirstUp(String val) {
+        String first = getValLow(val).substring(0, 1);
+        return getValLow(val).replaceFirst(first, first.toUpperCase());
+    }
+
+    public String getValFirstUp(String val) {
+        String first = val.substring(0, 1);
+        return val.replaceFirst(first, first.toUpperCase());
+    }
+
+    public String getValFirstLow(String val) {
+        String first = val.substring(0, 1);
+        return val.replaceFirst(first, first.toLowerCase());
+    }
+
+}
+
+D:\personal\MyProject\tmpgen\src\Process.java
+import config.BeanListReader;
+import config.ParaData;
+import config.ParaDataListBean;
+import config.ParameterConfig;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import util.TmpGenFilePathUtil;
+
+import java.io.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+public class Process {
+    VelocityContext context;
+
+    public Process() {
+        initialVelocity();
+    }
+
+    public void doProcess(String tmpPath, String outPath) {
+        Map splitParaMap = ParameterConfig.instance().getSplitParameterMap();
+        String maxLengthStr = (String) context.get("SPLIT_ARR_MAX_LENGTH");
+        maxLengthStr = StringUtils.isBlank(maxLengthStr) ? "1" : maxLengthStr;
+        int maxLength = Integer.parseInt(maxLengthStr);
+
+        for (int m = 0; m < maxLength; m++) {
+            Set keySetTmp = splitParaMap.keySet();
+            for (Object aKeySetTmp : keySetTmp) {
+                String key = (String) aKeySetTmp;
+                String[] valueArr = (String[]) context.get(key + "_ARR");
+                context.put(key, new ParaData(valueArr[m]));
+            }
+            prepareBeanList(context);
+            doProcessFolder(tmpPath, outPath);
+        }
+    }
+
+    public void doProcessFolder(String tmpPath, String outPath) {
+        long t1 = System.currentTimeMillis();
+        System.out.println("doProcess:" + t1 + " " + tmpPath);
+        File fp = new File(tmpPath);
+        File[] files = fp.listFiles();
+
+        for (int i = 0; files != null && i < files.length; i++) {
+            File fTmp = files[i];
+            if (isIgnoreFile(fTmp.getName())) {
+                continue;
+            }
+            String newFileFolderName = processFileFolderName(fTmp.getName());
+            if (fTmp.isDirectory()) {
+                String newTmpPath = tmpPath + "\\" + fTmp.getName();
+                String newOutPath = outPath + "\\" + newFileFolderName;
+                saveFolder(newOutPath);
+                doProcessFolder(newTmpPath, newOutPath);
+            } else {
+                String filePath = tmpPath + "\\" + fTmp.getName();
+                String newOutPath = outPath + "\\" + newFileFolderName;
+                processFile(filePath, newOutPath);
+            }
+        }
+    }
+
+    public String processFileFolderName(String fileFolderName) {
+        Writer writer;
+        String tmpFileName = String.valueOf(System.currentTimeMillis());
+        String tmpFilePath = TmpGenFilePathUtil.BASEPATH + "/" + tmpFileName;
+        String newName = fileFolderName;
+        try {
+            FileManage.saveFile(fileFolderName, tmpFilePath);
+            Template template = Velocity.getTemplate(tmpFileName);
+            writer = new StringWriter();
+            template.merge(context, writer);
+            newName = writer.toString();
+            writer.flush();
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            FileManage.delete(tmpFilePath);
+        }
+
+        return newName;
+    }
+
+    public void saveFolder(String outpath) {
+        FileManage.createFolder(outpath);
+    }
+
+    public void processFile(String filePath, String outPath) {
+        Writer writer;
+
+        try {
+            Template template = Velocity.getTemplate(filePath);
+            writer = new BufferedWriter(new FileWriter(outPath));
+            template.merge(context, writer);
+            writer.flush();
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void initialVelocity() {
+        try {
+            Velocity.init("velocity.properties");
+        } catch (Exception e) {
+            System.out.println("Problem initializing Velocity : " + e);
+        }
+        context = new VelocityContext();
+
+        Map paraMap = ParameterConfig.instance().getParameterMap();
+        Map splitParaMap = ParameterConfig.instance().getSplitParameterMap();
+        Set keySet = paraMap.keySet();
+        for (Object aKeySet : keySet) {
+            String key = (String) aKeySet;
+            Object val = paraMap.get(key);
+            String split = (String) splitParaMap.get(key);
+            split = StringUtils.isBlank(split) ? "" : split;
+            if (val instanceof String) {
+                context.put(key, new ParaData((String) val, split));
+                if (StringUtils.isNotBlank(split)) {
+                    initialSplitParameters(key, (String) val, split);
+                }
+            } else {
+                context.put(key, val);
+            }
+        }
+    }
+
+    public void initialSplitParameters(String key, String val, String split) {
+        String maxLengthStr = (String) context.get("SPLIT_ARR_MAX_LENGTH");
+        maxLengthStr = StringUtils.isBlank(maxLengthStr) ? "1" : maxLengthStr;
+        int maxLength = Integer.parseInt(maxLengthStr);
+        String[] arr = (String[]) context.get(key + "_ARR");
+        if (arr != null) {
+            if (maxLength == 1 || arr.length < maxLength) {
+                maxLength = arr.length;
+            }
+        }
+
+        String[] valueArr = String.valueOf(val).split(split);
+        if (maxLength == 1 || valueArr.length < maxLength) {
+            maxLength = valueArr.length;
+        }
+        context.put(key + "_ARR", valueArr);
+        context.put("SPLIT_ARR_MAX_LENGTH", String.valueOf(maxLength));
+    }
+
+    public boolean isIgnoreFile(String fileName) {
+        ParaData ignoreFiles = (ParaData) context.get("ignorefiles");
+        String[] files = ignoreFiles.getValue().split(",");
+        for (String file : files) {
+            if (fileName.equalsIgnoreCase(file)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void prepareBeanList(VelocityContext context) {
+        List nodeList = (List) context.get("beanList");
+        try {
+            for (Object aNodeList : nodeList) {
+                ParaDataListBean bean = (ParaDataListBean) aNodeList;
+                String keyName = bean.getName();
+                String className = bean.getListClass();
+                if (className != null && !className.trim().equals("")) {
+                    BeanListReader reader = (BeanListReader) Class.forName(className).newInstance();
+                    List beanList = reader.getBeanList(context);
+                    if (beanList == null) {
+                        continue;
+                    }
+                    context.put(keyName, beanList);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+
+D:\personal\MyProject\tmpgen\src\TmpGen.java
+import util.TmpGenFilePathUtil;
+
+public class TmpGen {
+    public static void main(String[] args) {
+        String tmpPath = TmpGenFilePathUtil.getTemplatePath();
+        String outPath = TmpGenFilePathUtil.getOutPath();
+
+        long t1 = System.currentTimeMillis();
+        Process process = new Process();
+        process.doProcess(tmpPath, outPath);
+        long t2 = System.currentTimeMillis();
+
+        System.out.println("Total Executed time:" + (t2 - t1));
+        System.out.println("Out Path:" + outPath);
+        System.out.println("Generate Template OK.");
+    }
+}
+
+D:\personal\MyProject\tmpgen\src\util\TmpGenFilePathUtil.java
+package util;
+
+public class TmpGenFilePathUtil {
+    public static final String BASEPATH = ".";
+
+    public static String getBasePath() {
+        return BASEPATH;
+    }
+
+    public static String getConfigFile() {
+        String tempFile = TmpGenProperties.getProperties("file.configuration.file");
+        if (tempFile == null || tempFile.trim().equals("")) {
+            tempFile = BASEPATH + "\\config\\ParameterConfig.xml";
+        }
+        return tempFile;
+    }
+
+    public static String getTemplatePath() {
+        String tempPath = TmpGenProperties.getProperties("file.template.path");
+        if (tempPath == null || tempPath.trim().equals("")) {
+            tempPath = BASEPATH + "\\template";
+        }
+        return tempPath;
+    }
+
+    public static String getOutPath() {
+        String tempPath = TmpGenProperties.getProperties("file.out.path");
+        if (tempPath == null || tempPath.trim().equals("")) {
+            tempPath = BASEPATH + "\\out";
+        }
+        return tempPath;
+    }
+}
+D:\personal\MyProject\tmpgen\src\util\TmpGenProperties.java
+package util;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+public class TmpGenProperties {
+    public static final String CONFIG_PATH = "tmpgen.properties";
+
+    public static Properties properties = null;
+
+    static {
+        try {
+            properties = new Properties();
+            InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_PATH);
+            if (is == null)
+                throw new RuntimeException("can't find the config file:" + CONFIG_PATH + "");
+            properties.load(is);
+        } catch (IOException e) {
+            throw new RuntimeException("failed to read " + CONFIG_PATH + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String getProperties(String name) {
+        return properties.getProperty(name);
+    }
+
+    public static String getProperties(String name, String defaultValue) {
+        String result = properties.getProperty(name);
+        if (result == null) {
+            return defaultValue;
+        } else {
+            return result;
+        }
+    }
+
+}
+
+D:\personal\MyProject\tmpgen\tmpgen.properties
+#Configuration File
+file.configuration.file=./config/ParameterConfig.xml
+
+#Configuration for Template and out path
+file.template.path=./template_hsa
+file.out.path=./out
+
+#Ingore Info
+ignorefields=,version,
+
+#Configuration for DBFieldReader. Include DB connection info and DB field type and java type's map.
+#DB Connection - MySQL
+db.driver=com.mysql.jdbc.Driver
+db.connection=jdbc:mysql://localhost:3306/test
+db.user=root
+db.pwd=root
+
+#DB Connection - Oracle
+#db.driver=oracle.jdbc.driver.OracleDriver
+#db.connection=jdbc:oracle:thin:@192.168.80.101:1521:oscsdb1x
+#db.user=PSMXUSER
+#db.pwd=pass1092
+
+#DB Connection - Sybase
+#db.driver=com.sybase.jdbc4.jdbc.SybDriver
+#db.connection=jdbc:sybase:Tds:192.168.000.000:0000/db_name
+#db.user=username
+#db.pwd=password
+
+#DB field group
+db.field.type.group.INT=INT,INT_UNSIGNED,TINYINT,TINYINT_UNSIGNED,BIT,SMALLINT,SMALLINT_UNSIGNED,INTEGER,MEDIUMINT,MEDIUMINT_UNSIGNED,BIGINT,BIGINT_UNSIGNED
+db.field.type.group.DOUBLE=DECIMAL,NUMERIC,NUMBER,REAL,DOUBLE,FLOAT
+db.field.type.group.STRING=CHAR,VARCHAR,VARCHAR2,TEXT
+db.field.type.group.BYTEARRAY=CLOB,GRAPHIC,VARGRAPHIC,DBCLOB,BLOB
+db.field.type.group.DATE=TIME,TIMESTAMP,DATE,DATETIME,YEAR
+
+#DB field type to java type Mapping
+db.field.type.mapping.INT=java.math.BigDecimal
+db.field.type.mapping.INT_UNSIGNED=java.math.BigDecimal
+db.field.type.mapping.TINYINT=java.math.BigDecimal
+db.field.type.mapping.TINYINT_UNSIGNED=java.math.BigDecimal
+db.field.type.mapping.BIT=java.math.BigDecimal
+db.field.type.mapping.SMALLINT=java.math.BigDecimal
+db.field.type.mapping.SMALLINT_UNSIGNED=java.math.BigDecimal
+db.field.type.mapping.INTEGER=java.math.BigDecimal
+db.field.type.mapping.MEDIUMINT=java.math.BigDecimal
+db.field.type.mapping.MEDIUMINT_UNSIGNED=java.math.BigDecimal
+db.field.type.mapping.BIGINT=java.math.BigDecimal
+db.field.type.mapping.BIGINT_UNSIGNED=java.math.BigDecimal
+
+db.field.type.mapping.DECIMAL=java.math.BigDecimal
+db.field.type.mapping.NUMERIC=java.math.BigDecimal
+db.field.type.mapping.NUMBER=java.math.BigDecimal
+db.field.type.mapping.REAL=java.math.BigDecimal
+db.field.type.mapping.DOUBLE=java.math.BigDecimal
+db.field.type.mapping.FLOAT=java.math.BigDecimal
+
+db.field.type.mapping.CHAR=java.lang.String
+db.field.type.mapping.VARCHAR=java.lang.String
+db.field.type.mapping.VARCHAR2=java.lang.String
+db.field.type.mapping.TEXT=java.lang.String
+
+db.field.type.mapping.CLOB=byte[]
+db.field.type.mapping.GRAPHIC=byte[]
+db.field.type.mapping.VARGRAPHIC=byte[]
+db.field.type.mapping.DBCLOB=byte[]
+db.field.type.mapping.BLOB=byte[]
+
+db.field.type.mapping.TIME=java.sql.Timestamp
+db.field.type.mapping.TIMESTAMP=java.sql.Timestamp
+db.field.type.mapping.DATE=java.sql.Timestamp
+db.field.type.mapping.DATETIME=java.sql.Timestamp
+db.field.type.mapping.YEAR=java.sql.Timestamp
+
+
+#Excel configuration
+excel.path=./config/FieldsDefine.xlsx
+excel.sheet=Sheet1
+excel.field.name.col=Name
+excel.field.type.col=Type
+excel.field.length.col=Length
+excel.field.ispk.col=isPK
+

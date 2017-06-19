@@ -1,0 +1,31 @@
+{
+    "index": {
+        "script": [
+            "scripts/${submodule}/index.js",
+            "scripts/${submodule}/${objectname.getFirstlowVal()}/index.js",
+            "scripts/${submodule}/${objectname.getFirstlowVal()}/controllers/index.js",
+            "scripts/${submodule}/${objectname.getFirstlowVal()}/controllers/${objectname.getFirstlowVal()}.ctrl.js",
+            "scripts/${submodule}/${objectname.getFirstlowVal()}/controllers/${objectname.getFirstlowVal()}.maintain.ctrl.js",
+            "scripts/${submodule}/${objectname.getFirstlowVal()}/filters/index.js",
+            "scripts/${submodule}/${objectname.getFirstlowVal()}/services/index.js",
+            "scripts/${submodule}/${objectname.getFirstlowVal()}/services/${objectname.getFirstlowVal()}.svr.js"
+        ],
+        "css": [
+        ]
+    },
+    "app": [
+        "${submodule}UIApp.${submodule}"
+    ],
+    "config": {
+        "${submodule}": {
+            "${objectname.getFirstlowVal()}": {
+                "list": "json/${objectname.getFirstlowVal()}/search${objectname}",
+                "searchPage": "json/${objectname.getFirstlowVal()}/search${objectname}Page",
+                "find": "json/${objectname.getFirstlowVal()}/find${objectname}/",
+                "create": "json/${objectname.getFirstlowVal()}/create${objectname}",
+                "update": "json/${objectname.getFirstlowVal()}/update${objectname}",
+                "delete": "json/${objectname.getFirstlowVal()}/delete${objectname}/"
+            }
+        }
+    }
+}

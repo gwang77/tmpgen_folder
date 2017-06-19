@@ -1,0 +1,92 @@
+<project name="tmpgen" default="dist" basedir=".">
+
+    <!-- set global properties for this build -->
+    <property file="build.properties" />
+    <property name="src" value="src"/>
+    <property name="dist" value="dist"/>
+    <property name="classes" value="classes"/>
+    <property name="out" value="out"/>
+    <property name="template" value="${template.name}"/>
+    <property name="config" value="config"/>
+    <property name="lib" value="lib"/>
+
+
+    <target name="init">
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${classes}"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <!-- Compile the java code from ${src} into ${classes} -->
+
+        <javac srcdir="${src}" destdir="${classes}">
+            <classpath>
+                <fileset dir="${lib}">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+        <copy todir="${classes}">
+            <fileset dir="${src}">
+                <include name="*.properties"/>
+            </fileset>
+        </copy>
+
+    </target>
+
+    <target name="package" depends="compile">
+        <!-- package compiled classes to a .jar file -->
+
+        <jar jarfile="tmpgen.jar">
+            <fileset dir="${classes}">
+                <include name="**"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <target name="dist" depends="package">
+        <!-- Create the distribution folder -->
+        <mkdir dir="${dist}"/>
+        <!-- Copy distribution file to the folder -->
+        <copy todir="${dist}">
+            <fileset dir=".">
+                <include name="${out}/**"/>
+                <include name="${template}/**"/>
+                <include name="${config}/ParameterConfig.xml"/>
+                <include name="tmpgen.jar"/>
+                <include name="*.bat"/>
+                <exclude name="build.bat"/>
+                <include name="readme.txt"/>
+                <include name="velocity.properties"/>
+                <include name="tmpgen.properties"/>
+                <include name="${lib}/velocity*.jar"/>
+                <include name="${lib}/commons*.jar"/>
+                <include name="${lib}/${db.driver.jar}"/>
+                <!--<include name="${lib}/poi*.jar"/>-->
+                <!--<include name="${lib}/xmlbeans*.jar"/>-->
+            </fileset>
+
+        </copy>
+
+        <!-- Create the distribution .Zip file -->
+        <jar jarfile="tmpgen.zip">
+            <fileset dir="${dist}">
+                <include name="**"/>
+            </fileset>
+        </jar>
+
+        <!-- Delete the ${build} and ${dist} directory trees -->
+        <delete dir="${dist}"/>
+    </target>
+
+    <target name="source">
+        <jar jarfile="src.zip">
+            <fileset dir=".">
+                <include name="${src}/**"/>
+            </fileset>
+        </jar>
+    </target>
+</project>
+
