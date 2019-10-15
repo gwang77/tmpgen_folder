@@ -1,4 +1,4 @@
 
-set JAVA_HOME=D:\java\jdk1.7.0_80
+set JAVA_HOME=D:\Java\jdk1.8.0_131
 
-D:\Software\javatools\apache-ant-1.9.7\bin\ant.bat
+D:\workspace\study\apache-ant-1.10.7\bin\ant.bat

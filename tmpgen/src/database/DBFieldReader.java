@@ -6,10 +6,7 @@ import org.apache.velocity.VelocityContext;
 import util.TmpGenProperties;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DBFieldReader implements BeanListReader {
     public static final Map<String, List> fieldListMap = new HashMap<String, List>();
@@ -44,10 +41,12 @@ public class DBFieldReader implements BeanListReader {
                 if (columnType != null && columnType.contains("identity")) {
                     columnType = columnType.replaceAll("identity", "").trim();
                 }
+                String columnComment = rs.getString("REMARKS");
 
                 DBField dbField = new DBField();
                 dbField.setName(columnName);
                 dbField.setType(convertDBType(columnType.toUpperCase()));
+                dbField.setDesc(columnComment);
                 list.add(dbField);
             }
             rsPK = metaData.getPrimaryKeys(null, null, tableName);
@@ -100,7 +99,13 @@ public class DBFieldReader implements BeanListReader {
         String userName = TmpGenProperties.getProperties("db.user");
         String password = TmpGenProperties.getProperties("db.pwd");
         Class.forName(driver);
-        conn = DriverManager.getConnection(connectionURL, userName, password);
+
+        Properties props =new Properties();
+        props.setProperty("user",userName);
+        props.setProperty("password",password);
+        props.setProperty("remarksReporting","true");
+        conn = DriverManager.getConnection(connectionURL, props);
+//        conn = DriverManager.getConnection(connectionURL, userName, password);
         return conn;
     }
 }
