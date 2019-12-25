@@ -1,0 +1,28 @@
+#set($stat ="#")
+#set($doll ="$")
+#set($comma ='"')
+#set($lbrace ='{')
+#set($rbrace ='}')
+#set($condileft="${stat}if(${comma}${doll}!${lbrace}")
+#set($condiright="${rbrace}${comma} != ${comma}${comma})")
+#set($tbNameTmp="${objectname}")
+#set($objectnameFirstLow="${TmpGenUtil.getValFirstLow($tbNameTmp)}")
+<?xml version="1.0" encoding="utf-8" ?>
+<jpa module="${objectnameFirstLow}">
+    <jpql id="search" resultClass="com.${baseproject}.${project}.${module}.vo.${objectname}VO" native="true">
+        select
+#foreach($field in ${fieldList})
+            $field.getName()#if($foreach.hasNext)
+,
+#end
+#end
+
+        from ${tablename}
+        where 1=1
+#foreach( $field in ${fieldList})
+        ${condileft}${field.getNameLow()}${condiright}
+            and $field.getName() = :$field.getNameLow()
+        ${stat}end
+#end
+    </jpql>
+</jpa>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<parameters>
+    <parameter name="baseproject" value="baseproject"/>
+    <parameter name="project" value="prms"/>
+    <parameter name="module" value="building"/>
+    <parameter name="submodule" value=""/>
+	<parameter name="objectname" value="Building" split=","/>
+	<parameter name="objectnameLow" value="building" split=","/>
+	<parameter name="tablename" value="building" split=","/>
+
+	<parameter name="ignorefiles" value="USERS"/>
+
+    <!--
+    beanList configure the class to get Bean List. The class need implements BeanListReader, and implements getBeanList() method. The method result is List.
+    -->
+
+	<beanList name="fieldList" listClass="database.DBFieldReader"/>
+	<!--
+	<beanList name="fieldList2" listClass="database.ExcelDBFieldReader"/>
+	<beanList name="fieldList3" listClass="excel.ExcelReader"/>
+	-->
+
+<!--
+	<fields>
+		<field name="id" type="INT" length="2" ispk="true"/>
+	</fields>
+-->
+
+	<process name="TmpGenUtil" classpath="process.TmpGenUtil"/>
+
+</parameters>
+

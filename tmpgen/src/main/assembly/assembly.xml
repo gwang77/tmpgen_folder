@@ -1,0 +1,42 @@
+<assembly>
+    <id>assembly</id>
+
+    <formats>
+        <format>rar</format>
+    </formats>
+
+    <includeBaseDirectory>true</includeBaseDirectory>
+
+    <fileSets>
+        <fileSet>
+            <directory>src/main/resources</directory>
+            <outputDirectory>.</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/template</directory>
+            <outputDirectory>template</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>target/lib/</directory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+            <outputDirectory>lib</outputDirectory>
+        </fileSet>
+    </fileSets>
+
+    <files>
+        <file>
+            <source>target/tmpgen.jar</source>
+            <outputDirectory>.</outputDirectory>
+        </file>
+    </files>
+
+    <dependencySets>
+        <dependencySet>
+            <unpack>false</unpack>
+            <scope>runtime</scope>
+            <outputDirectory>lib</outputDirectory>
+        </dependencySet>
+    </dependencySets>
+</assembly>
