@@ -13,12 +13,8 @@
             <outputDirectory>.</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>./template</directory>
+            <directory>src/main/template</directory>
             <outputDirectory>template</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>./config</directory>
-            <outputDirectory>config</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target/lib/</directory>
@@ -32,10 +28,6 @@
     <files>
         <file>
             <source>target/tmpgen.jar</source>
-            <outputDirectory>.</outputDirectory>
-        </file>
-        <file>
-            <source>./tmpgen.properties</source>
             <outputDirectory>.</outputDirectory>
         </file>
     </files>
