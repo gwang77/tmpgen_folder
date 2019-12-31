@@ -1,10 +1,10 @@
 package database;
 
 import process.TmpGenUtil;
+import util.StringUtils;
 import util.TmpGenProperties;
 
-public class DBField
-{
+public class DBField {
     private String name;
     private String type;
     private int length;
@@ -13,26 +13,23 @@ public class DBField
 
     private static String ignorefields = TmpGenProperties.getProperties("ignorefields").toUpperCase();
 
-    public DBField()
-    {
+    public DBField() {
     }
-    public DBField(String name, String type, int length)
-    {
+
+    public DBField(String name, String type, int length) {
         this.name = name;
         this.type = type;
         this.length = length;
     }
 
-    public DBField(String name, String type, int length, boolean PK)
-    {
+    public DBField(String name, String type, int length, boolean PK) {
         this.name = name;
         this.type = type;
         this.length = length;
         isPK = PK;
     }
 
-    public DBField(String name, String type, int length, boolean PK, String desc)
-    {
+    public DBField(String name, String type, int length, boolean PK, String desc) {
         this.name = name;
         this.type = type;
         this.length = length;
@@ -40,88 +37,76 @@ public class DBField
         this.desc = desc;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
-    public void setType(String type)
-    {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public int getLength()
-    {
+    public int getLength() {
         return length;
     }
 
-    public void setLength(int length)
-    {
+    public void setLength(int length) {
         this.length = length;
     }
 
-    public boolean isPK()
-    {
+    public boolean isPK() {
         return isPK;
     }
 
-    public void setPK(boolean PK)
-    {
+    public void setPK(boolean PK) {
         isPK = PK;
     }
 
-    public String getDesc()
-    {
+    public String getDesc() {
         return desc;
     }
 
-    public void setDesc(String desc)
-    {
+    public void setDesc(String desc) {
         this.desc = desc;
     }
 
-    public String getNameLow()
-    {
+    public String getNameLow() {
         return name.toLowerCase();
     }
 
-    public String getNameLowFirstUp()
-    {
+    public String getNameLowFirstUp() {
         String first = getNameLow().substring(0, 1);
         return getNameLow().replaceFirst(first, first.toUpperCase());
     }
 
-    public String getNameUp()
-    {
+    public String getNameUp() {
         return name.toUpperCase();
     }
 
-    public String getNameFirstUp()
-    {
+    public String getNameFirstUp() {
         String first = name.substring(0, 1);
         return name.replaceFirst(first, first.toUpperCase());
     }
 
-    public String getNameFirstLow()
-    {
+    public String getNameFirstLow() {
         String first = name.substring(0, 1);
         return name.replaceFirst(first, first.toLowerCase());
     }
 
-    public String getNameFirstLowWithType()
-    {
+    public String getNameHump() {
+        return StringUtils.lineToHump(name);
+    }
+
+    public String getNameFirstLowWithType() {
         String nameTmp = getNameFirstLow();
-        if(!isIgnored()) {
+        if (!isIgnored()) {
             if (TmpGenUtil.isDate(getType())) {
                 nameTmp = nameTmp + "_d";
             }
@@ -132,13 +117,11 @@ public class DBField
         return nameTmp;
     }
 
-    public String getLowVal()
-    {
+    public String getLowVal() {
         return name.toLowerCase();
     }
 
-    public String getUpVal()
-    {
+    public String getUpVal() {
         return name.toUpperCase();
     }
 
