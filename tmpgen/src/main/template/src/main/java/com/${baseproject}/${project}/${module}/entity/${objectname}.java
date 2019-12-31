@@ -21,7 +21,11 @@ public class ${objectname} extends BaseEntity {
 #if($field.isPK())
     @Id
 #end
+    /**
+     * $field.getDesc()
+     */
     private $TmpGenUtil.getFieldJavaType($field.getType()) $field.getNameLow();
+
 #end
 #end
 }
