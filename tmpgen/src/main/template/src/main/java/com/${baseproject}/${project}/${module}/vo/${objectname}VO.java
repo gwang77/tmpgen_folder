@@ -5,6 +5,7 @@ import com.${baseproject}.${project}.${module}.entity.${objectname};
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Data
@@ -13,7 +14,7 @@ public class ${objectname}VO extends BaseVO<${objectname}> {
 
 #foreach( $field in ${fieldList})
 #if(!$field.isIgnored())
-    private $TmpGenUtil.getFieldJavaType($field.getType()) $field.getNameLow();
+    private $TmpGenUtil.getFieldJavaType($field.getType()) $field.getNameHump();
 #end
 #end
 }

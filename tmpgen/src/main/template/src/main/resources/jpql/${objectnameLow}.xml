@@ -20,9 +20,14 @@
         from ${tablename}
         where 1=1
 #foreach( $field in ${fieldList})
-        ${condileft}${field.getNameLow()}${condiright}
-            and $field.getName() = :$field.getNameLow()
+        ${condileft}${field.getNameHump()}${condiright}
+            and $field.getName() = :$field.getNameHump()
         ${stat}end
 #end
-    </jpql>
+        ${condileft}orderBy${condiright}
+        ${condileft}dir${condiright}
+            order by ${doll}orderBy ${doll}dir
+        ${stat}end
+        ${stat}end
+	</jpql>
 </jpa>
