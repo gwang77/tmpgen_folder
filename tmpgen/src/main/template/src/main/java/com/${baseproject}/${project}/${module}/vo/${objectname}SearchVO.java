@@ -1,6 +1,6 @@
 package com.${baseproject}.${project}.${module}.vo;
 
-import com.kedacom.prms.base.vo.BaseSearchVO;
+import com.${baseproject}.${project}.base.vo.BaseSearchVO;
 import com.${baseproject}.${project}.${module}.entity.${objectname};
 import lombok.Data;
 

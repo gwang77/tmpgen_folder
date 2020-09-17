@@ -3,7 +3,7 @@
 
 package com.${baseproject}.${project}.${module}.service.impl;
 
-import com.kedacom.kidp.base.data.common.jpql.JpqlQuerySupport;
+import com.${baseproject}.kidp.base.data.common.jpql.JpqlQuerySupport;
 import com.${baseproject}.${project}.base.service.impl.BaseCrudServiceImpl;
 import com.${baseproject}.${project}.${module}.vo.${objectname}SearchVO;
 import com.${baseproject}.${project}.${module}.vo.${objectname}VO;

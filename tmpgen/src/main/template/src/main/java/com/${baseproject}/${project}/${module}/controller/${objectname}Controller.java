@@ -1,6 +1,6 @@
 package com.${baseproject}.${project}.${module}.controller;
 
-import com.kedacom.ctsp.web.controller.message.ResponseMessage;
+import com.${baseproject}.ctsp.web.controller.message.ResponseMessage;
 import com.${baseproject}.${project}.base.controller.BaseCommController;
 import com.${baseproject}.${project}.${module}.entity.${objectname};
 import com.${baseproject}.${project}.${module}.service.${objectname}Service;
