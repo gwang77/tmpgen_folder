@@ -93,7 +93,7 @@ public class Process {
         Writer writer;
 
         try {
-            Template template = Velocity.getTemplate(filePath);
+            Template template = Velocity.getTemplate(filePath, "UTF-8");
             writer = new BufferedWriter(new FileWriter(outPath));
             template.merge(context, writer);
             writer.flush();
