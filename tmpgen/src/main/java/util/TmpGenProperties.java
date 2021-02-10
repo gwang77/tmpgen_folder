@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class TmpGenProperties {
-    public static final String CONFIG_PATH = "tmpgen.properties";
+    private static final String CONFIG_PATH = "tmpgen.properties";
 
     public static Properties properties = null;
 
@@ -13,8 +13,9 @@ public class TmpGenProperties {
         try {
             properties = new Properties();
             InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_PATH);
-            if (is == null)
+            if (is == null) {
                 throw new RuntimeException("can't find the config file:" + CONFIG_PATH + "");
+            }
             properties.load(is);
         } catch (IOException e) {
             throw new RuntimeException("failed to read " + CONFIG_PATH + e.getMessage());

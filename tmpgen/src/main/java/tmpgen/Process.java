@@ -1,14 +1,14 @@
+package tmpgen;
+
 import config.BeanListReader;
 import config.ParaData;
 import config.ParaDataListBean;
 import config.ParameterConfig;
 import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import util.TmpGenFilePathUtil;
 
-import java.io.*;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,7 +49,7 @@ public class Process {
             if (isIgnoreFile(fTmp.getName())) {
                 continue;
             }
-            String newFileFolderName = processFileFolderName(fTmp.getName());
+            String newFileFolderName = VelocityUtil.convertTemplate(fTmp.getName(), context);
             if (fTmp.isDirectory()) {
                 String newTmpPath = tmpPath + "\\" + fTmp.getName();
                 String newOutPath = outPath + "\\" + newFileFolderName;
@@ -63,44 +63,14 @@ public class Process {
         }
     }
 
-    public String processFileFolderName(String fileFolderName) {
-        Writer writer;
-        String tmpFileName = String.valueOf(System.currentTimeMillis());
-        String tmpFilePath = TmpGenFilePathUtil.BASEPATH + "/" + tmpFileName;
-        String newName = fileFolderName;
-        try {
-            FileManage.saveFile(fileFolderName, tmpFilePath);
-            Template template = Velocity.getTemplate(tmpFileName);
-            writer = new StringWriter();
-            template.merge(context, writer);
-            newName = writer.toString();
-            writer.flush();
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            FileManage.delete(tmpFilePath);
-        }
-
-        return newName;
-    }
-
     public void saveFolder(String outpath) {
         FileManage.createFolder(outpath);
     }
 
     public void processFile(String filePath, String outPath) {
-        Writer writer;
-
-        try {
-            Template template = Velocity.getTemplate(filePath, "UTF-8");
-            writer = new BufferedWriter(new FileWriter(outPath));
-            template.merge(context, writer);
-            writer.flush();
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String fileStr = FileManage.readTextFile(filePath, "UTF-8");
+        String newFileStr = VelocityUtil.convertTemplate(fileStr, context);
+        FileManage.saveFile(newFileStr, outPath);
     }
 
     public void initialVelocity() {

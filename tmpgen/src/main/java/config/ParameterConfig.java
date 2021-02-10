@@ -10,6 +10,8 @@ import util.TmpGenFilePathUtil;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,13 +52,40 @@ public class ParameterConfig {
         return (String) splitParameterMap.get(name);
     }
 
+    private Document getConfigDoc() {
+        String configFilePath = TmpGenFilePathUtil.getConfigFile();
+        InputStream in = null;
+        try {
+            DocumentBuilder docbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            in = ParameterConfig.class.getClassLoader().getResourceAsStream(configFilePath);
+            return docbuilder.parse(in);
+        } catch (Exception e) {
+            System.out.println("error load by classpath:" + configFilePath);
+            System.out.println(e.getMessage());
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        try {
+            DocumentBuilder docbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            return docbuilder.parse(configFilePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private void initial() {
         parameterMap = null;
         parameterMap = new HashMap();
 
         try {
-            DocumentBuilder docbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document doc = docbuilder.parse(TmpGenFilePathUtil.getConfigFile());
+            Document doc = getConfigDoc();
             NodeList list = doc.getElementsByTagName("parameter");
             for (int i = 0; i < list.getLength(); i++) {
                 Node node = list.item(i);
